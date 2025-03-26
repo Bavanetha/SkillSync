@@ -1,42 +1,50 @@
-import {useState} from "react";
-import {Link} from "react-router-dom";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import navp from "../assets/profile.jpeg"; // Ensure the path is correct
 
-const Nav = () => {
+const Navbar = () => {
+  const [dropdown, setDropdown] = useState(false);
 
-    var [dropdown, setDropdown] = useState(false);
-    
-    const handleDropdown = () => {
-        setDropdown(dropdown => !dropdown);
-    }
-
-   return (
+  return (
     <div className="absolute top-0 left-0 w-full h-[81px] flex items-center px-8 justify-between">
-        <p className="text-3xl font-semibold">
-            <span className="text-black">Skill</span>
-            <span className="text-blue-700">Sync</span>
-        </p>
-        <div className="flex space-x-8 text-2xl font-semibold">
-            <Link to="/"><span className="text-blue-700">Home</span></Link>
-            <Link to="/mypath"><span>My Path</span></Link>
-            <Link to="/ass"><span>Assessment</span></Link>
-            <Link to="/contact"><span>Contact</span></Link>
-            <div onMouseEnter={handleDropdown} onMouseLeave={handleDropdown} className="dropdown">
-                <span><img
-                    className="w-[32px] h-10"
-                    alt="Vector"
-                    src="https://c.animaapp.com/m8nde78yCBHZqt/img/vector.svg"
-                /></span>
-                {dropdown ? (
-                  <ul className="bg-slate-400">
-                    <li><Link to="/profile" className="Link">Profile</Link></li>
-                    <li><Link to="/dashboard" className="Link">Dashboard</Link></li>
-                    <li><Link to="" className="Link">Logout</Link></li>
-                  </ul>
-                ) : ("")}
-            </div>
-        </div>
-    </div>
-  )
-}
+      {/* Logo */}
+      <p className="text-3xl font-semibold">
+        <span className="text-black">Skill</span>
+        <span className="text-blue-700">Sync</span>
+      </p>
 
-export default Nav
+      {/* Navigation Links */}
+      <div className="flex items-center space-x-8 text-2xl font-semibold">
+        <Link to="/" className=" hover:text-blue-500">Home</Link>
+        <Link to="/mypath" className=" hover:text-blue-500">My Path</Link>
+        <Link to="/ass" className=" hover:text-blue-500">Assessment</Link>
+        <Link to="/contact" className=" hover:text-blue-500">Contact</Link>
+        
+        {/* Dropdown Section */}
+        <div 
+          className="relative cursor-pointer" 
+          onMouseEnter={() => setDropdown(true)} 
+          onMouseLeave={() => setDropdown(false)}
+        >
+          <img className="w-[45px] h-[45px] object-cover rounded-full" alt="Profile" src={navp} />
+          
+          {dropdown && (
+            <ul className="absolute top-full right-0 text-xl bg-gray-200 border border-gray-300 rounded-lg w-[150px] py-2 shadow-md z-10">
+              <li className="px-4 py-2 hover:bg-gray-300">
+                <Link to="/profile" className=" hover:text-blue-500">Profile</Link>
+              </li>
+              <li className="px-4 py-2 hover:bg-gray-300">
+                <Link to="/dashboard" className=" hover:text-blue-500">Dashboard</Link>
+              </li>
+              <li className="px-4 py-2 hover:bg-gray-300">
+                <Link to="" className=" hover:text-blue-500">Logout</Link>
+              </li>
+            </ul>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Navbar;
