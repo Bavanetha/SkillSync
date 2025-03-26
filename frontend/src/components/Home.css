@@ -1,0 +1,66 @@
+.hero-button {
+    @apply absolute top-[450px] left-[644px] bg-black text-white px-6 py-2 rounded-full text-lg;
+  }
+  
+  .career-button {
+    @apply mt-6 bg-black text-white px-6 py-3 rounded-full text-lg;
+  }
+  
+  .join-button {
+    @apply mt-6 bg-black text-white px-8 py-3 rounded-full text-lg;
+  }
+  
+  .feature-box {
+    @apply flex flex-col items-center space-y-4;
+  }
+  
+  .feature-box img {
+    @apply w-40 h-40 object-cover;
+  }
+  
+  .feature-box p {
+    @apply text-2xl font-medium;
+  }
+  
+  .dropdown {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+  }
+  
+  .dropdown ul {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: rgb(237, 237, 237);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 150px;
+    padding: 10px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    display: none;
+    z-index: 1000;
+  }
+  
+  .dropdown ul li {
+    padding: 10px;
+    text-align: left;
+    transition: background 0.3s ease;
+  }
+  
+  .dropdown ul li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    display: block;
+  }
+  
+  .dropdown ul li:hover {
+    background-color: #fcfcfc;
+  }
+  
+  .dropdown:hover ul {
+    display: block;
+  }
+  
