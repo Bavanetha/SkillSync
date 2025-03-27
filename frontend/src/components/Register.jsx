@@ -34,8 +34,7 @@ const Register = () => {
         experience:formData.experience,
         level:formData.level
       })
-      console.log(req)
-      alert(req.data.response);
+      alert("signup successfull");
       if(req.data.signupStatus){
         navigate("/login");
       }

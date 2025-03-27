@@ -82,9 +82,7 @@ app.post('/login', async (req, res) => {
         const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: "24h" });
 
         res.status(200).json({ 
-            message: "Login successful", loginStatus: true, token, 
-            username: user.username, email, company: user.company || "", expertise: user.specialization 
-        });
+            message: "Login successful", loginStatus: true, token});
 
     } catch (err) {
         console.error("Login Error:", err);

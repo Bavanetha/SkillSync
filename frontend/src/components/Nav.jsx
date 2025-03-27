@@ -20,12 +20,10 @@ const Navbar = () => {
 
   const getUserProfile = async () => {
     try {
-      console.log(user);
       const res = await axios.get("https://skillsync-8z4m.onrender.com/json",{
         headers: { Authorization: `Bearer ${user}` }
         
     });
-     console.log(res)
       setUsername(res.data.user);
     } catch (error) {
       console.error("Error fetching user profile:", error);

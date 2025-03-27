@@ -29,14 +29,8 @@ const Login = () => {
         payload: req.data.token,
       });
       localStorage.setItem("token", req.data.token);
-      localStorage.setItem("email", req.data.email);
-      localStorage.setItem("username", req.data.username);
-      localStorage.setItem("company", req.data.company);
-      localStorage.setItem("expertise", req.data.expertise);
-      console.log(req.data.email);
       var isLoginSuccessful = req.data.loginStatus;
       if (isLoginSuccessful) {
-        alert(req.data.response);
         navigate("/");
       } else {
         alert(req.data.response);
