@@ -1,37 +1,43 @@
-import './App.css'
-import {BrowserRouter,Routes,Route} from "react-router-dom";
+import {useContext} from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./components/Home";
+import Nav from "./components/Nav";
+import MyPath from "./components/MyPath";
+import Assessment from "./components/Assessment";
+import Contact from "./components/Contact";
+import Profile from "./components/Profile";
+import Dashboard from "./components/Dashboard";
+import Register from "./components/Register";
+import Login from "./components/Login";
 
-import Home from "./components/Home.jsx";
-import MyPath from "./components/MyPath.jsx";
-import Assessment from "./components/Assessment.jsx";
-import Contact from "./components/Contact.jsx";
-import Profile from "./components/Profile.jsx";
-import Dashboard from "./components/Dashboard.jsx";
+import PrivateRoute from "./components/PrivateRoute";
+import { AuthContext } from "./components/AuthContext";
 
-import Register from "./components/Register.jsx";
-import Login from "./components/Login.jsx";
+const App = () => {
+  const { user, dispatch } = useContext(AuthContext);
+  
+  console.log(user)
 
-import Nav from "./components/Nav.jsx";
-
-
-function App() {
   return (
-
-    <BrowserRouter>
+    <Router>
       <Nav/>
       <Routes>
+        {/* Public Route */}
         <Route path="/" element={<Home />} />
-        <Route path="/mypath" element={<MyPath />} />
-        <Route path="/ass" element={<Assessment />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-      </Routes>
-    </BrowserRouter>
-  )
-}
 
-export default App
+        {/* Protected Routes */}
+        <Route element={<PrivateRoute user={user} />}>
+          <Route path="/mypath" element={<MyPath />} />
+          <Route path="/ass" element={<Assessment />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;

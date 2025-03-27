@@ -1,19 +1,51 @@
-import { useState } from "react";
-import login from "../assets/login.png"
+import { useContext,useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import login from "../assets/login.png";
+import { AuthContext } from "./AuthContext";
+
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const { dispatch } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit =async (e) => {
     e.preventDefault();
-    console.log("Form Submitted", formData);
-  };
+    try{
+      console.log("event triggered");
+      const req = await axios.post("https://skillsync-8z4m.onrender.com/login",{
+        email:formData.email,
+        password:formData.password
+      })
+      dispatch({
+        type: "LOGIN",
+        payload: req.data.token,
+      });
+      localStorage.setItem("token", req.data.token);
+      localStorage.setItem("email", req.data.email);
+      localStorage.setItem("username", req.data.username);
+      localStorage.setItem("company", req.data.company);
+      localStorage.setItem("expertise", req.data.expertise);
+      console.log(req.data.email);
+      var isLoginSuccessful = req.data.loginStatus;
+      if (isLoginSuccessful) {
+        alert(req.data.response);
+        navigate("/");
+      } else {
+        alert(req.data.response);
+      }
+    }
+    catch(err){
+        console.log(err);
+    }
+};
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

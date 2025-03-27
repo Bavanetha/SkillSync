@@ -1,29 +1,96 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaCamera, FaTrash } from "react-icons/fa";
-import profile from "../assets/profile.jpeg";
+import { AuthContext } from "./AuthContext";
+import axios from "axios";
+import defaultProfile from "../assets/profile.jpeg";
 
 const Profile = () => {
-  const [profilePic, setProfilePic] = useState(profile);
-  const [username, setUsername] = useState("John Doe");
-  const [email, setEmail] = useState("johndoe@example.com");
-  const [company, setCompany] = useState("TechCorp");
-  const [expertise, setExpertise] = useState("Full Stack Developer");
+  const token = localStorage.getItem("token"); // Retrieve token
+  const navigate = useNavigate();
+  const { dispatch } = useContext(AuthContext);
 
+  const [profileData, setProfileData] = useState({
+    username: "",
+    email: "",
+    company: "",
+    specialization: "",
+    profilePic: defaultProfile, 
+  });
+
+  useEffect(() => {
+    if (!token) {
+      console.error("No token found");
+      return;
+    }
+
+    axios
+      .get("https://skillsync-8z4m.onrender.com/profile", {
+        headers: { authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setProfileData(res.data.user || {}); 
+      })
+      .catch((err) => {
+        console.error("Error fetching profile:", err);
+      });
+  }, [token]);
+
+  const handleChange = (e) => {
+    setProfileData({ ...profileData, [e.target.name]: e.target.value || "" });
+  };
+
+  const handleSaveChanges = () => {
+    axios
+      .put("https://skillsync-8z4m.onrender.com/profile", profileData, {
+        headers: { authorization: `Bearer ${token}` },
+      })
+      .then(() => {
+        alert("Profile updated successfully!");
+      })
+      .catch((err) => {
+        console.error("Error updating profile:", err);
+      });
+  };
+
+  const handleDeleteAccount = () => {
+    if (window.confirm("Are you sure you want to delete your account?")) {
+      axios
+        .delete("https://skillsync-8z4m.onrender.com/profile", {
+          headers: { authorization: `Bearer ${token}` },
+        })
+        .then(() => {
+          alert("Account deleted successfully!");
+          localStorage.removeItem("token");
+          dispatch({ type: "LOGOUT" });
+          navigate("/");
+        })
+        .catch((err) => {
+          console.error("Error deleting account:", err);
+        });
+    }
+  };
+
+  // Profile Picture Upload
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setProfilePic(URL.createObjectURL(file));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileData({ ...profileData, profilePic: reader.result });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
-      <div className="bg-white mt-16  shadow-lg rounded-2xl p-8 w-full max-w-3xl">
+      <div className="bg-white mt-16 shadow-lg rounded-2xl p-8 w-full max-w-3xl">
         {/* Profile Picture */}
         <div className="flex flex-col items-center">
           <div className="relative w-32 h-32">
             <img
-              src={profilePic}
+              src={profileData.profilePic || defaultProfile}
               alt="Profile"
               className="w-32 h-32 rounded-full object-cover border-4 border-gray-300"
             />
@@ -37,7 +104,7 @@ const Profile = () => {
               />
             </label>
           </div>
-          <h2 className="text-2xl font-semibold mt-4">{username}</h2>
+          <h2 className="text-2xl font-semibold mt-4">{profileData.username || "User"}</h2>
         </div>
 
         {/* Editable Fields */}
@@ -46,8 +113,9 @@ const Profile = () => {
             <label className="block text-gray-700 font-semibold">Username</label>
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              name="username"
+              value={profileData.username || ""}
+              onChange={handleChange}
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-teal-500"
             />
           </div>
@@ -55,17 +123,19 @@ const Profile = () => {
             <label className="block text-gray-700 font-semibold">Email</label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-teal-500"
+              name="email"
+              value={profileData.email || ""}
+              readOnly
+              className="w-full p-3 border rounded-lg bg-gray-200 cursor-not-allowed"
             />
           </div>
           <div>
             <label className="block text-gray-700 font-semibold">Company</label>
             <input
               type="text"
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
+              name="company"
+              value={profileData.company || ""}
+              onChange={handleChange}
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-teal-500"
             />
           </div>
@@ -73,8 +143,9 @@ const Profile = () => {
             <label className="block text-gray-700 font-semibold">Expertise</label>
             <input
               type="text"
-              value={expertise}
-              onChange={(e) => setExpertise(e.target.value)}
+              name="specialization"
+              value={profileData.specialization || ""}
+              onChange={handleChange}
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-teal-500"
             />
           </div>
@@ -82,10 +153,16 @@ const Profile = () => {
 
         {/* Buttons */}
         <div className="mt-6 flex justify-between">
-          <button className="bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition">
+          <button
+            className="bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition"
+            onClick={handleSaveChanges}
+          >
             Save Changes
           </button>
-          <button className="bg-red-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-red-700 transition">
+          <button
+            className="bg-red-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-red-700 transition"
+            onClick={handleDeleteAccount}
+          >
             <FaTrash /> Delete Account
           </button>
         </div>

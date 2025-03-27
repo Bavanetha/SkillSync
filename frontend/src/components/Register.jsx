@@ -1,5 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import signup from "../assets/signup.png"
+import axios from 'axios';
+
 const Register = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -12,13 +15,37 @@ const Register = () => {
     level :""
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit =async (e) => {
     e.preventDefault();
-    console.log("Form Submitted", formData);
+    try{
+      const req = await axios.post("https://skillsync-8z4m.onrender.com/signup",{
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        specialization:formData.specialization,
+        role:formData.role,
+        company:formData.company,
+        experience:formData.experience,
+        level:formData.level
+      })
+      console.log(req)
+      alert(req.data.response);
+      if(req.data.signupStatus){
+        navigate("/login");
+      }
+      else{
+        navigate("/signup")
+      }
+    }
+      catch(err){
+        console.log(err);
+      }
   };
 
   return (
