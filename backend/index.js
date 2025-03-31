@@ -4,21 +4,46 @@ const dotenv = require('dotenv');
 const bcrypt = require('bcrypt');
 const cors = require("cors");
 const jwt = require('jsonwebtoken');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 dotenv.config();
 const app = express();
 const Register = require("./models/RegisterSchema");
+const CareerPathLevel = require("./models/CareerPathLevelSchema");
 
 app.use(cors());
 app.use(express.json());
+
+const genAI = new GoogleGenerativeAI(process.env.GEN_API);
 
 mongodb.connect(process.env.MONGODB_URL)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log("MongoDB Connection Error:", err));
 
+async function generateContent(prompt) {
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      const config = { temperature: 1, responseMimeType: "text/plain" };
+  
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: config,
+      });
+  
+      const response = await result.response;
+      return JSON.parse(await cleanResponse(response.text()));
+    } catch (error) {
+      console.error("Gemini API Error:", error);
+      return [];
+    }
+}
+
+function cleanResponse(response) {
+    return response.replace(/^```json|```$/g, "").trim();
+}
+
 //Middleware to verify token
 const verifiedToken = (req, res, next) => {
-    console.log("Middleware triggered");
     
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -55,6 +80,28 @@ app.post("/signup", async (req, res) => {
         });
 
         await newUser.save();
+         // Generate Career Path for User
+    const userInput = `The user is a ${level} level ${specialization} developer with ${experience} years working experience and working at ${company}. Generate a career path to become a proficient ${specialization} who meets industry needs. The response should be structured in JSON format with fields: level, lessons, course_name, udemy, coursera, professional_course.Provide courses link.Provide each level as array.`
+
+    console.log("\nGenerating career path...");
+    const careerPathLevels = await generateContent(userInput);
+    const careerArray = careerPathLevels.career_path;
+
+    // Store Career Path
+    const savedLevels = await CareerPathLevel.insertMany(
+      careerArray.map((levelData) => ({
+        userId: newUser._id,
+        level: levelData.level,
+        lessons: levelData.lessons,
+        course_name: levelData.course_name,
+        udemy: levelData.udemy,
+        coursera: levelData.coursera,
+        professional_course: levelData.professional_course,
+      }))
+    );
+
+    console.log("Career Path Levels saved!");
+
         res.status(201).json({ message: "Signup successful", signupStatus: true });
     } catch (err) {
         console.error("Signup Error:", err);
@@ -78,7 +125,7 @@ app.post('/login', async (req, res) => {
             return res.status(401).json({ message: "Incorrect password", loginStatus: false });
         }
 
-        const payload = { email: user.email, username: user.username };
+        const payload = { userId: user._id,email: user.email, username: user.username };
         const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: "24h" });
 
         res.status(200).json({ 
@@ -87,6 +134,28 @@ app.post('/login', async (req, res) => {
     } catch (err) {
         console.error("Login Error:", err);
         res.status(500).json({ message: "Error during login" });
+    }
+});
+
+// API to Fetch User's Career Path
+app.get("/mypath", async (req, res) => {
+    try {
+      const token = req.headers.authorization;
+      if (!token) return res.status(401).json({ message: "Unauthorized" });
+  
+      const decoded = jwt.verify(token.split(" ")[1], process.env.SECRET_KEY);
+      const userId = decoded.userId;
+  
+      const careerPathLevels = await CareerPathLevel.find({ userId });
+  
+      if (careerPathLevels.length === 0) {
+        return res.status(404).json({ message: "No career path found for this user" });
+      }
+  
+      res.json({ data: careerPathLevels });
+    } catch (error) {
+      console.error("Error fetching career path:", error);
+      res.status(500).json({ message: "Server error" });
     }
 });
 
@@ -124,10 +193,10 @@ app.put("/profile", verifiedToken, async (req, res) => {
 //Delete Account
 app.delete("/profile", verifiedToken, async (req, res) => {
     try {
-        const deletedUser = await Register.findOneAndDelete({ email: req.user.email });
-
+        const deletedUser = await Register.findOneAndDelete({ email: req.user.email },{ returnDocument: "before" });
         if (!deletedUser) return res.status(404).json({ message: "User not found" });
-
+        console.log(deletedUser._id);
+        const deletedCareerPath = await CareerPathLevel.deleteMany({ userId: deletedUser._id });
         res.json({ message: "Account deleted successfully" });
     } catch (error) {
         console.error("Delete Account Error:", error);

@@ -24,7 +24,7 @@ const Register = () => {
   const handleSubmit =async (e) => {
     e.preventDefault();
     try{
-      const req = await axios.post("https://skillsync-8z4m.onrender.com/signup",{
+      const req = await axios.post("http://localhost:3000/signup",{
         username: formData.username,
         email: formData.email,
         password: formData.password,
