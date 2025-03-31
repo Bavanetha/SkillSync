@@ -9,6 +9,7 @@ import Profile from "./components/Profile";
 import Dashboard from "./components/Dashboard";
 import Register from "./components/Register";
 import Login from "./components/Login";
+import Footer from "./components/Footer";
 
 import PrivateRoute from "./components/PrivateRoute";
 import { AuthContext } from "./components/AuthContext";
@@ -36,6 +37,7 @@ const App = () => {
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
       </Routes>
+      <Footer/>
     </Router>
   );
 };

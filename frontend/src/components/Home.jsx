@@ -105,11 +105,6 @@ const Home = () => {
           </p>
           <button className="join-button">Join Now</button>
         </div>
-
-        {/* Footer */}
-        <div className="bg-neutral-100 py-4 text-center text-lg font-medium">
-          SkillSync © All rights are reserved
-        </div>
       </div>
     </div>
   );
