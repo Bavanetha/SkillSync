@@ -21,7 +21,7 @@ const MyPath = () => {
           return;
         }
 
-        const response = await axios.get("http://localhost:3000/mypath", {
+        const response = await axios.get("https://skillsync-8z4m.onrender.com/mypath",{
           headers: { Authorization: `Bearer ${token}` },
         });
 

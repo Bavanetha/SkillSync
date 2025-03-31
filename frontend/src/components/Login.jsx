@@ -20,7 +20,7 @@ const Login = () => {
     e.preventDefault();
     try{
       console.log("event triggered");
-      const req = await axios.post("http://localhost:3000/login",{
+      const req = await axios.post("https://skillsync-8z4m.onrender.com/login",{
         email:formData.email,
         password:formData.password
       })
