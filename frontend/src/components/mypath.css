@@ -1,6 +1,9 @@
 .mypath-container {
     text-align: center;
     padding: 20px;
+    height:170vh;
+    margin-bottom: 20px;
+    background-color: #f6f6f6;
   }
   
   .title {

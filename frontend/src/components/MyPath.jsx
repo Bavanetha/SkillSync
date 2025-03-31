@@ -65,7 +65,7 @@ const MyPath = () => {
                   onClick={() => handleLevelClick(index)}
                   className="level active w-24 h-24 text-center flex items-center justify-center overflow-hidden whitespace-nowrap truncate"
                 >
-                  Level {index}
+                  Level {index+1}
                 </button>
 
                 {selectedLevel === item && (
@@ -93,6 +93,7 @@ const MyPath = () => {
           })}
         </div>
       )}
+      
     </div>
   );
 };
