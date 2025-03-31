@@ -81,7 +81,7 @@ app.post("/signup", async (req, res) => {
 
         await newUser.save();
          // Generate Career Path for User
-    const userInput = `The user is a ${level} level ${specialization} developer with ${experience} years working experience and working at ${company}. Generate a career path to become a proficient ${specialization} who meets industry needs. The response should be structured in JSON format with fields: level, lessons, course_name, udemy, coursera, professional_course.Provide courses link.Provide each level as array.`
+    const userInput = `The user is a ${level} level ${specialization} developer with ${experience} years working experience and working at ${company}. Generate a career path to become a proficient ${specialization} who meets industry needs. The response should be structured in JSON format with fields: level, lessons, course_name, udemy, coursera, professional_course.Provide each level as array.`
 
     console.log("\nGenerating career path...");
     const careerPathLevels = await generateContent(userInput);
